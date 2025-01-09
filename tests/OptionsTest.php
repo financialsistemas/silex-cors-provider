@@ -4,13 +4,14 @@ namespace JDesrosiers\Silex\Provider\Tests;
 
 use JDesrosiers\Silex\Provider\CorsServiceProvider;
 use Silex\Application;
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
+use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
-class OptionsTest extends \PHPUnit_Framework_TestCase
+class OptionsTest extends PHPUnit_Framework_TestCase
 {
-    protected $app;
+    protected Application $app;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->app = new Application();
         $this->app["debug"] = true;
@@ -28,7 +29,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             return "foo";
         });
 
-        $client = new Client($this->app);
+        $client = new HttpKernelBrowser($this->app);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -45,7 +46,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             return "foo";
         })->assert("foo", "\d+");
 
-        $client = new Client($this->app);
+        $client = new HttpKernelBrowser($this->app);
         $client->request("OPTIONS", "/foo/23");
 
         $response = $client->getResponse();
@@ -62,7 +63,7 @@ class OptionsTest extends \PHPUnit_Framework_TestCase
             return "foo";
         })->assert("foo", "\d+");
 
-        $client = new Client($this->app);
+        $client = new HttpKernelBrowser($this->app);
         $client->request("OPTIONS", "/foo/asdf");
 
         $response = $client->getResponse();

@@ -8,7 +8,7 @@ use Silex\Api\BootableProviderInterface;
 use Silex\Application;
 use Silex\Controller;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -25,10 +25,10 @@ class CorsServiceProvider implements ServiceProviderInterface, BootableProviderI
      */
     public function boot(Application $app)
     {
-        $app->on(KernelEvents::EXCEPTION, function (GetResponseForExceptionEvent $event) {
-            $e = $event->getException();
+        $app->on(KernelEvents::EXCEPTION, function (ExceptionEvent $event) {
+            $e = $event->getThrowable();
             if ($e instanceof MethodNotAllowedHttpException && $e->getHeaders()["Allow"] === "OPTIONS") {
-                $event->setException(new NotFoundHttpException("No route found for \"{$event->getRequest()->getMethod()} {$event->getRequest()->getPathInfo()}\""));
+                $event->setThrowable(new NotFoundHttpException("No route found for \"{$event->getRequest()->getMethod()} {$event->getRequest()->getPathInfo()}\""));
             }
         });
     }
@@ -51,7 +51,7 @@ class CorsServiceProvider implements ServiceProviderInterface, BootableProviderI
 
         $app["options"] = $app->protect(function ($subject) use ($app) {
             $optionsController = function () {
-                return Response::create("", 204);
+                return new Response("", 204);
             };
 
             if ($subject instanceof Controller) {

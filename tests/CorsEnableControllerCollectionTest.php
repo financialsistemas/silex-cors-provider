@@ -3,14 +3,15 @@
 namespace JDesrosiers\Silex\Provider\Tests;
 
 use JDesrosiers\Silex\Provider\CorsServiceProvider;
+use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 use Silex\Application;
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
 
-class CorsEnableControllerCollectionTest extends \PHPUnit_Framework_TestCase
+class CorsEnableControllerCollectionTest extends PHPUnit_Framework_TestCase
 {
-    protected $client;
+    protected HttpKernelBrowser $client;
 
-    public function setUp()
+    public function setUp(): void
     {
         $app = new Application();
         $app["debug"] = true;
@@ -26,7 +27,7 @@ class CorsEnableControllerCollectionTest extends \PHPUnit_Framework_TestCase
             return "bar";
         });
 
-        $this->client = new Client($app, ["HTTP_ORIGIN" => "http://www.foo.com"]);
+        $this->client = new HttpKernelBrowser($app, ["HTTP_ORIGIN" => "http://www.foo.com"]);
     }
 
     public function testEnabledPreflight()

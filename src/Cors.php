@@ -28,24 +28,24 @@ class Cors
         $this->cors($request, $response, $this->options + $defaults);
     }
 
-    private function cors(Request $request, Response $response, $options)
+    private function cors(Request $request, Response $response, $options): void
     {
         $headers = [];
 
         if (!$this->isCorsRequest($request)) {
-            return [];
+            return;
         }
 
         if ($this->isPreflightRequest($request)) {
             $requestMethod = $request->headers->get("Access-Control-Request-Method");
             $allow = $response->headers->get("Allow");
             if (!$this->isMethodAllowed($requestMethod, $allow, $options["allowMethods"])) {
-                return [];
+                return;
             }
 
             $requestHeaders = $request->headers->get("Access-Control-Request-Headers");
             if (!$this->areHeadersAllowed($requestHeaders, $options["allowHeaders"])) {
-                return [];
+                return;
             }
 
             $headers["Access-Control-Allow-Headers"] = $requestHeaders;
@@ -58,7 +58,7 @@ class Cors
         $allowOrigin = $this->allowOrigin($request, $options["allowOrigin"]);
 
         if (!$allowOrigin) {
-            return [];
+            return;
         }
 
         $headers["Access-Control-Allow-Origin"] = $allowOrigin;
@@ -67,16 +67,30 @@ class Cors
         $response->headers->add(array_filter($headers));
     }
 
+    /**
+     * @param Request $request
+     * @return bool
+     */
     private function isCorsRequest(Request $request)
     {
         return $request->headers->has("Origin");
     }
 
+    /**
+     * @param Request $request
+     * @return bool
+     */
     private function isPreflightRequest(Request $request)
     {
         return $request->getMethod() === "OPTIONS" && $request->headers->has("Access-Control-Request-Method");
     }
 
+    /**
+     * @param $requestMethod
+     * @param $allow
+     * @param $allowMethods
+     * @return bool
+     */
     private function isMethodAllowed($requestMethod, $allow, $allowMethods)
     {
         $commaSeparatedMethods = !is_null($allowMethods) ? $allowMethods : $allow;
@@ -84,6 +98,11 @@ class Cors
         return in_array($requestMethod, $allowedMethods);
     }
 
+    /**
+     * @param $commaSeparatedRequestHeaders
+     * @param $allowHeaders
+     * @return bool
+     */
     private function areHeadersAllowed($commaSeparatedRequestHeaders, $allowHeaders)
     {
         if ($allowHeaders === null) {
@@ -111,6 +130,10 @@ class Cors
         return false;
     }
 
+    /**
+     * @param $domain
+     * @return string
+     */
     private function domainToRegex($domain)
     {
         $star = $this->doubleQuote("*");
@@ -122,11 +145,19 @@ class Cors
         return "/^" . preg_replace($wildcard, $subdomain, $quotedDomain) . "$/";
     }
 
+    /**
+     * @param $subject
+     * @return string
+     */
     private function doubleQuote($subject)
     {
         return preg_quote(preg_quote($subject, "/"), "/");
     }
 
+    /**
+     * @param $allowCredentials
+     * @return string|null
+     */
     private function allowCredentials($allowCredentials)
     {
         return $allowCredentials === true ? "true" : null;

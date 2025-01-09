@@ -10,12 +10,20 @@
         }
     ],
     "require": {
-        "silex/silex": "~2.0"
+        "silex/silex": "dev-master"
     },
     "require-dev": {
-        "symfony/browser-kit": "2.3.*",
-        "phpunit/phpunit": "5.*"
+        "phpunit/phpunit": "^9.6",
+        "symfony/browser-kit": "^5.0",
+        "symfony/http-kernel": "^5.0",
+        "symfony/routing": "^5.0"
     },
+    "repositories": [
+        {
+            "url": "https://github.com/financialsistemas/Silex.git",
+            "type": "vcs"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "JDesrosiers\\Silex\\Provider\\": "src/"

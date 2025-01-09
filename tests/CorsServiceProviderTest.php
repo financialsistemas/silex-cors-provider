@@ -4,13 +4,14 @@ namespace JDesrosiers\Silex\Provider\Tests;
 
 use JDesrosiers\Silex\Provider\CorsServiceProvider;
 use Silex\Application;
-use Symfony\Component\HttpKernel\Client;
+use Symfony\Component\HttpKernel\HttpKernelBrowser;
+use PHPUnit\Framework\TestCase as PHPUnit_Framework_TestCase;
 
-class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
+class CorsServiceProviderTest extends PHPUnit_Framework_TestCase
 {
-    protected $app;
+    protected Application $app;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->app = new Application();
         $this->app["debug"] = true;
@@ -32,7 +33,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "GET",
             "HTTP_ACCESS_CONTROL_REQUEST_HEADERS" => "content-type",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -61,7 +62,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ORIGIN" => "http://www.foo.com",
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "POST",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -78,7 +79,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("", $response->getContent());
     }
 
-    public function dataProviderAllowOrigin()
+    public function dataProviderAllowOrigin(): array
     {
         return [
             ["*"],
@@ -105,7 +106,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
         $headers = [
             "HTTP_ORIGIN" => "http://www.foo.com",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("GET", "/foo");
 
         $response = $client->getResponse();
@@ -120,7 +121,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("foo", $response->getContent());
     }
 
-    public function dataProviderAllowOriginFail()
+    public function dataProviderAllowOriginFail(): array
     {
         return [
             ["http://foo.example.com"],
@@ -150,7 +151,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ORIGIN" => "http://www.foo.example.com",
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "GET",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -179,7 +180,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ORIGIN" => "http://www.foo.com",
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "GET",
         );
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -208,7 +209,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ORIGIN" => "http://www.foo.com",
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "GET",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -238,7 +239,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "GET",
             "HTTP_ACCESS_CONTROL_REQUEST_HEADERS" => "if-modified-since",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -267,7 +268,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ORIGIN" => "http://www.foo.com",
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "POST",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -296,7 +297,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             "HTTP_ORIGIN" => "http://www.foo.com",
             "HTTP_ACCESS_CONTROL_REQUEST_METHOD" => "GET",
         );
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("OPTIONS", "/foo");
 
         $response = $client->getResponse();
@@ -324,7 +325,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
         $headers = [
             "HTTP_ORIGIN" => "http://www.foo.com",
         ];
-        $client = new Client($this->app, $headers);
+        $client = new HttpKernelBrowser($this->app, $headers);
         $client->request("GET", "/foo");
 
         $response = $client->getResponse();
@@ -347,7 +348,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
             return "foo";
         });
 
-        $client = new Client($this->app);
+        $client = new HttpKernelBrowser($this->app);
         $client->request("GET", "/foo");
 
         $response = $client->getResponse();
@@ -360,7 +361,7 @@ class CorsServiceProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->app["cors-enabled"]($this->app);
 
-        $client = new Client($this->app);
+        $client = new HttpKernelBrowser($this->app);
         $client->request("GET", "/foo");
 
         $response = $client->getResponse();

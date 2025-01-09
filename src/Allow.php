@@ -11,6 +11,12 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class Allow
 {
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param Application $app
+     * @return Response
+     */
     public function __invoke(Request $request, Response $response, Application $app)
     {
         $requestMethod = $app["request_context"]->getMethod();
